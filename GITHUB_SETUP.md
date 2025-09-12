@@ -15,8 +15,8 @@ This guide will help you set up your SMELS repository on GitHub with all the nec
 ## 2. Push Your Code
 
 ```bash
-# Add the GitHub remote (replace 'yourusername' with your GitHub username)
-git remote add origin https://github.com/yourusername/smels-rs.git
+# Add the GitHub remote
+git remote add origin https://github.com/etuckerdev/smels-rs.git
 
 # Push the code
 git push -u origin master
@@ -35,25 +35,12 @@ Go to your repository Settings → Secrets and variables → Actions
 
 ## 4. Update Workflow Files
 
-Before your first push, update these files with your GitHub username:
+✅ **Already Done!** The workflow files are already configured with the correct username (`etuckerdev`).
 
-### `.github/workflows/release.yml`
-```yaml
-if: github.repository_owner == 'yourusername'  # Replace with your GitHub username
-```
-
-### `.github/dependabot.yml`
-```yaml
-reviewers:
-  - "yourusername"  # Replace with your GitHub username
-assignees:
-  - "yourusername"  # Replace with your GitHub username
-```
-
-### `CONTRIBUTING.md`
-```markdown
-git remote add upstream https://github.com/yourusername/smels-rs.git
-```
+The following files have been set up correctly:
+- `.github/workflows/release.yml` - Uses `etuckerdev` for repository owner checks
+- `.github/dependabot.yml` - Uses `etuckerdev` for reviewers and assignees
+- `CONTRIBUTING.md` - Uses `etuckerdev` for upstream remote URL
 
 ## 5. Enable GitHub Features
 
@@ -102,11 +89,11 @@ This will trigger the release workflow and publish to crates.io.
 
 ## 8. Repository Badges
 
-Add these badges to your README.md:
+✅ **Already Done!** The README.md already includes the correct badges with your username:
 
 ```markdown
-[![CI](https://github.com/yourusername/smels-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/smels-rs/actions/workflows/ci.yml)
-[![Security Audit](https://github.com/yourusername/smels-rs/actions/workflows/security.yml/badge.svg)](https://github.com/yourusername/smels-rs/actions/workflows/security.yml)
+[![CI](https://github.com/etuckerdev/smels-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/etuckerdev/smels-rs/actions/workflows/ci.yml)
+[![Security Audit](https://github.com/etuckerdev/smels-rs/actions/workflows/security.yml/badge.svg)](https://github.com/etuckerdev/smels-rs/actions/workflows/security.yml)
 [![Crates.io](https://img.shields.io/crates/v/smels.svg)](https://crates.io/crates/smels)
 [![Documentation](https://docs.rs/smels/badge.svg)](https://docs.rs/smels)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -124,7 +111,7 @@ Add these badges to your README.md:
 ### CI/CD Issues
 - Check the Actions tab for failed runs
 - Ensure all secrets are set correctly
-- Verify your GitHub username in workflow files
+- ✅ **Username configuration is already correct** (`etuckerdev`)
 
 ### Publishing Issues
 - Make sure `CRATES_IO_TOKEN` has publish permissions
