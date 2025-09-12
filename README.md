@@ -1,8 +1,12 @@
 # SMELS - AI-Powered Error Log Analyzer
 
+[![CI](https://github.com/etuckerdev/smels-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/etuckerdev/smels-rs/actions/workflows/ci.yml)
+[![Security Audit](https://github.com/etuckerdev/smels-rs/actions/workflows/security.yml/badge.svg)](https://github.com/etuckerdev/smels-rs/actions/workflows/security.yml)
 [![Crates.io](https://img.shields.io/crates/v/smels.svg)](https://crates.io/crates/smels)
 [![Documentation](https://docs.rs/smels/badge.svg)](https://docs.rs/smels)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
+SMELS is an intelligent error log analyzer that uses AI to understand and provide actionable insights for errors across multiple programming languages including Rust, JavaScript/TypeScript, Python, and Java.
 
 SMELS is an intelligent error log analyzer that uses AI to understand and provide actionable insights for errors across multiple programming languages including Rust, JavaScript/TypeScript, Python, and Java.
 
@@ -120,6 +124,16 @@ SMELS consists of several key components:
 - **Templates**: Output formatting for different interfaces
 - **Cache System**: Performance optimization through result caching
 
+## 🧪 Testing & Quality
+
+SMELS maintains high code quality through:
+
+- **Comprehensive Test Suite**: Unit tests, integration tests, and CLI tests
+- **Continuous Integration**: Automated testing on multiple Rust versions
+- **Security Audits**: Regular dependency vulnerability scanning
+- **Code Quality**: Clippy linting and formatting checks
+- **Documentation**: Auto-generated docs.rs documentation
+
 ## 📊 Sample Output
 
 ```
@@ -141,7 +155,7 @@ Related:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! See our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### Development Setup
 
@@ -151,6 +165,10 @@ cd smels-rs
 cargo build
 cargo test
 ```
+
+### Repository Setup
+
+For first-time setup, see [GitHub Setup Guide](GITHUB_SETUP.md).
 
 ### Adding New Language Support
 
