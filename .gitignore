@@ -1,0 +1,120 @@
+# Rust build artifacts
+/target/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Cache files
+smels_cache.json
+*.cache
+
+# Log files
+*.log
+test.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Ollama models (if downloaded locally)
+ollama/
+
+# Web server files (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Documentation build
+book/
+docs/build/
+
+# Backup files
+*.bak
+*.backup
+
+# Test coverage
+*.profraw
+coverage/
+
+# CI/CD
+.github/workflows/*.log
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Cache files
+smels_cache.json
+*.cache
+
+# Log files
+*.log
+test.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Ollama models (if downloaded locally)
+ollama/
+
+# Web server files (if any)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Documentation build
+book/
+docs/build/
+
+# Backup files
+*.bak
+*.backup
+
+# Test coverage
+*.profraw
+coverage/
+
+# CI/CD
+.github/workflows/*.log
+js_error.txt
+Cargo.lock
+port_error.txt
+test_error.txt

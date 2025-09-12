@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMELS - Error Analysis</title>
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔬</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        :root {
+            --primary: #667eea;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --surface: #ffffff;
+            --background: #f8fafc;
+            --text: #1f2937;
+            --muted: #6b7280;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+        }
+        
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .tab-active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .analyze-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.3);
+        }
+        
+        .analyze-btn:active {
+            transform: translateY(0);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .copy-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(0,0,0,0.2) !important;
+        }
+        
+        .processing-pulse {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .toast {
+            animation: toastFade 3s forwards;
+        }
+        
+        @keyframes toastFade {
+            0% { opacity: 0; transform: translateY(20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(20px); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-4 md:p-6 shadow-lg">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <i data-feather="activity" class="w-8 h-8"></i>
+                <h1 class="text-xl md:text-2xl font-bold">SMELS - Error Analysis</h1>
+            </div>
+            <div class="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full">
+                <i data-feather="cpu" class="w-4 h-4"></i>
+                <span class="text-sm font-medium">AI: ON</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-6 max-w-4xl">
+        <!-- Input Panel -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8 card-hover" data-aos="fade-up">
+            <div class="flex flex-wrap gap-3 mb-5">
+                <button id="pasteTab" class="tab-active px-4 py-2 rounded-lg font-medium flex items-center gap-2">
+                    <i data-feather="clipboard" class="w-4 h-4"></i>
+                    Paste Error Log
+                </button>
+                <button id="uploadTab" class="px-4 py-2 rounded-lg font-medium border border-gray-200 flex items-center gap-2">
+                    <i data-feather="file" class="w-4 h-4"></i>
+                    Upload File
+                </button>
+            </div>
+            
+            <div id="pasteContent" class="mb-5">
+                <textarea 
+                    id="errorInput" 
+                    class="w-full min-h-[200px] border-2 border-gray-200 rounded-lg p-4 code-font text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all"
+                    placeholder="Paste your error log here..."># Example Rust error:
+panic: called `Option::unwrap()` on a `None` value
+at src/main.rs:42:5
+stack backtrace:
+   0: rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: core::option::expect_none_failed
+   3: smels_example::main
+   4: std::rt::lang_start::{{closure}}</textarea>
+            </div>
+            
+            <div id="uploadContent" class="hidden mb-5">
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-400 transition-colors">
+                    <i data-feather="upload" class="w-12 h-12 mx-auto text-gray-400 mb-3"></i>
+                    <p class="text-gray-600 mb-2">Drag & drop your log file here</p>
+                    <p class="text-sm text-gray-500 mb-4">or</p>
+                    <button class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg font-medium hover:bg-indigo-200 transition-colors">
+                        Browse Files
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-4 mb-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Language</label>
+                    <select class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+                        <option>Auto-detect</option>
+                        <option>Rust</option>
+                        <option>Python</option>
+                        <option>JavaScript</option>
+                        <option>Go</option>
+                        <option>Java</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">AI Mode</label>
+                    <div class="flex items-center">
+                        <button class="flex items-center gap-2 px-3 py-2 bg-green-100 text-green-800 rounded-lg font-medium">
+                            <i data-feather="cpu" class="w-4 h-4"></i>
+                            ON
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="analyzeBtn" class="analyze-btn w-full md:w-auto px-8 py-3 text-white font-semibold rounded-lg shadow-md flex items-center justify-center gap-2 mx-auto">
+                <i data-feather="search" class="w-5 h-5"></i>
+                Analyze Error
+            </button>
+        </div>
+        
+        <!-- Results Panel -->
+        <div id="resultsPanel" class="hidden">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8 card-hover" data-aos="fade-up">
+                <div class="flex items-center gap-2 mb-5">
+                    <i data-feather="bar-chart-2" class="w-5 h-5 text-indigo-600"></i>
+                    <h2 class="text-xl font-bold">Analysis Results</h2>
+                </div>
+                
+                <!-- Summary -->
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg mb-6 slide-in">
+                    <div class="flex items-start gap-3">
+                        <i data-feather="alert-circle" class="w-5 h-5 text-red-500 mt-0.5"></i>
+                        <div>
+                            <h3 class="font-bold text-red-800">Panic Detected</h3>
+                            <p class="text-red-700">Called `Option::unwrap()` on a `None` value</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Root Causes -->
+                <div class="mb-6">
+                    <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+                        <i data-feather="target" class="w-5 h-5 text-amber-500"></i>
+                        Root Causes
+                    </h3>
+                    
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-lg mb-4 slide-in">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-amber-800">Unchecked None Value</h4>
+                                <p class="text-amber-700 mt-1">The code attempted to unwrap an Option without checking if it contained a value.</p>
+                                <div class="mt-2 text-sm text-amber-600">
+                                    <p>• Location: src/main.rs:42</p>
+                                </div>
+                            </div>
+                            <span class="bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full">95%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Fixes -->
+                <div class="mb-6">
+                    <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+                        <i data-feather="tool" class="w-5 h-5 text-green-500"></i>
+                        Recommended Fixes
+                    </h3>
+                    
+                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg mb-4 slide-in">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-green-800">Use expect() with Context</h4>
+                                <p class="text-green-700 mt-1">Provide a descriptive message when unwrapping to aid debugging.</p>
+                                <div class="mt-3 bg-slate-800 text-slate-100 p-3 rounded-lg code-font text-sm">
+                                    // Before<br>
+                                    let value = option.unwrap();<br><br>
+                                    // After<br>
+                                    let value = option.expect("Value should exist because...");
+                                </div>
+                            </div>
+                            <button class="copy-btn bg-black/10 p-2 rounded ml-2" title="Copy to clipboard">
+                                <i data-feather="copy" class="w-4 h-4 text-slate-700"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg slide-in">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-green-800">Handle None Case Explicitly</h4>
+                                <p class="text-green-700 mt-1">Use pattern matching to handle both Some and None cases.</p>
+                                <div class="mt-3 bg-slate-800 text-slate-100 p-3 rounded-lg code-font text-sm">
+                                    match option {<br>
+                                    &nbsp;&nbsp;Some(value) => { /* handle value */ },<br>
+                                    &nbsp;&nbsp;None => { /* handle missing value */ }<br>
+                                    }
+                                </div>
+                            </div>
+                            <button class="copy-btn bg-black/10 p-2 rounded ml-2" title="Copy to clipboard">
+                                <i data-feather="copy" class="w-4 h-4 text-slate-700"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Related Links -->
+                <div>
+                    <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+                        <i data-feather="link" class="w-5 h-5 text-blue-500"></i>
+                        Related Resources
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <a href="#" class="flex items-center gap-2 p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                            <i data-feather="book" class="w-4 h-4 text-blue-600"></i>
+                            <span class="text-blue-800">Rust Option Documentation</span>
+                        </a>
+                        <a href="#" class="flex items-center gap-2 p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                            <i data-feather="book-open" class="w-4 h-4 text-blue-600"></i>
+                            <span class="text-blue-800">Error Handling Guide</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Status Bar -->
+    <footer class="bg-gray-50 border-t border-gray-200 p-4">
+        <div class="container mx-auto max-w-4xl flex flex-wrap justify-between items-center gap-4">
+            <div class="flex flex-wrap gap-4">
+                <div class="flex items-center gap-2 text-green-600">
+                    <i data-feather="check-circle" class="w-4 h-4"></i>
+                    <span class="font-medium">Ready</span>
+                </div>
+                <div class="flex items-center gap-2 text-amber-600">
+                    <i data-feather="zap" class="w-4 h-4"></i>
+                    <span>0.2s</span>
+                </div>
+                <div class="flex items-center gap-2 text-indigo-600">
+                    <i data-feather="cpu" class="w-4 h-4"></i>
+                    <span>qwen2.5-coder:0.5b</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button class="flex items-center gap-1 text-gray-600 hover:text-gray-900">
+                    <i data-feather="download" class="w-4 h-4"></i>
+                    <span class="text-sm">Export</span>
+                </button>
+                <button class="flex items-center gap-1 text-gray-600 hover:text-gray-900 ml-3">
+                    <i data-feather="moon" class="w-4 h-4"></i>
+                    <span class="text-sm">Dark Mode</span>
+                </button>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg hidden toast">
+        Copied to clipboard!
+    </div>
+    
+    <script>
+        // Initialize Feather Icons
+        feather.replace();
+        
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-out-cubic'
+        });
+        
+        // Tab switching functionality
+        const pasteTab = document.getElementById('pasteTab');
+        const uploadTab = document.getElementById('uploadTab');
+        const pasteContent = document.getElementById('pasteContent');
+        const uploadContent = document.getElementById('uploadContent');
+        
+        pasteTab.addEventListener('click', () => {
+            pasteTab.classList.add('tab-active');
+            uploadTab.classList.remove('tab-active');
+            pasteContent.classList.remove('hidden');
+            uploadContent.classList.add('hidden');
+        });
+        
+        uploadTab.addEventListener('click', () => {
+            uploadTab.classList.add('tab-active');
+            pasteTab.classList.remove('tab-active');
+            uploadContent.classList.remove('hidden');
+            pasteContent.classList.add('hidden');
+        });
+        
+        // Analyze button functionality
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const resultsPanel = document.getElementById('resultsPanel');
+        
+        analyzeBtn.addEventListener('click', async function() {
+            const errorInput = document.getElementById('errorInput');
+            const languageSelect = document.querySelector('select');
+            
+            if (!errorInput.value.trim()) {
+                showToast('Please enter an error log to analyze', 'error');
+                return;
+            }
+            
+            // Add processing state
+            const originalContent = this.innerHTML;
+            this.innerHTML = '<i data-feather="loader" class="w-5 h-5 animate-spin"></i> Analyzing...';
+            this.disabled = true;
+            
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        error_text: errorInput.value,
+                        language: languageSelect.value === 'Auto-detect' ? null : languageSelect.value.toLowerCase(),
+                        use_ai: document.querySelector('.bg-green-100') !== null
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateResultsPanel(result);
+                    resultsPanel.classList.remove('hidden');
+                    resultsPanel.scrollIntoView({ behavior: 'smooth' });
+                    showToast('Analysis complete!', 'success');
+                } else {
+                    showToast(result.error || 'Analysis failed', 'error');
+                }
+                
+            } catch (error) {
+                console.error('Analysis error:', error);
+                showToast('Failed to connect to analysis server', 'error');
+            } finally {
+                // Reset button
+                this.innerHTML = originalContent;
+                this.disabled = false;
+                feather.replace();
+            }
+        });
+        
+        // Copy button functionality
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const codeElement = this.previousElementSibling.querySelector('code') || 
+                                   this.previousElementSibling;
+                const text = codeElement.textContent || codeElement.innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('Copied to clipboard!');
+                }).catch(() => {
+                    showToast('Failed to copy', 'error');
+                });
+            });
+        });
+        
+        // Update results panel with API response
+        function updateResultsPanel(result) {
+            const summaryElement = document.querySelector('.bg-red-50 .text-red-700');
+            const causesContainer = document.querySelector('.mb-6:nth-child(2)');
+            const fixesContainer = document.querySelector('.mb-6:nth-child(3)');
+            const linksContainer = document.querySelector('.grid.grid-cols-1.md\\:grid-cols-2');
+            
+            // Update summary
+            if (summaryElement) {
+                summaryElement.textContent = result.summary;
+            }
+            
+            // Update root causes
+            if (causesContainer) {
+                const causesList = causesContainer.querySelector('div');
+                if (causesList) {
+                    if (result.root_causes.length > 0) {
+                        causesList.innerHTML = result.root_causes.map(cause => 
+                            `<div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-lg mb-4 slide-in">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h4 class="font-bold text-amber-800">${cause}</h4>
+                                    </div>
+                                    <span class="bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full">95%</span>
+                                </div>
+                            </div>`
+                        ).join('');
+                    } else {
+                        causesList.innerHTML = '<p class="text-gray-500">No root causes identified</p>';
+                    }
+                }
+            }
+            
+            // Update fixes
+            if (fixesContainer) {
+                const fixesList = fixesContainer.querySelectorAll('div.bg-green-50');
+                if (result.fixes.length > 0) {
+                    const fixesHtml = result.fixes.map((fix, index) => 
+                        `<div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-lg mb-4 slide-in">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-green-800">Fix ${index + 1}</h4>
+                                    <p class="text-green-700 mt-1">${fix}</p>
+                                </div>
+                                <button class="copy-btn bg-black/10 p-2 rounded ml-2" title="Copy to clipboard">
+                                    <i data-feather="copy" class="w-4 h-4 text-slate-700"></i>
+                                </button>
+                            </div>
+                        </div>`
+                    ).join('');
+                    
+                    // Replace existing fixes
+                    fixesContainer.innerHTML = `
+                        <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+                            <i data-feather="tool" class="w-5 h-5 text-green-500"></i>
+                            Recommended Fixes
+                        </h3>
+                        ${fixesHtml}
+                    `;
+                } else {
+                    fixesContainer.innerHTML = `
+                        <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+                            <i data-feather="tool" class="w-5 h-5 text-green-500"></i>
+                            Recommended Fixes
+                        </h3>
+                        <p class="text-gray-500">No fixes available</p>
+                    `;
+                }
+            }
+            
+            // Update related links
+            if (linksContainer && result.related.length > 0) {
+                linksContainer.innerHTML = result.related.map(link => 
+                    `<a href="${link}" target="_blank" class="flex items-center gap-2 p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                        <i data-feather="external-link" class="w-4 h-4 text-blue-600"></i>
+                        <span class="text-blue-800">${link}</span>
+                    </a>`
+                ).join('');
+            }
+            
+            // Re-initialize feather icons for new elements
+            feather.replace();
+            
+            // Re-attach copy button listeners
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const text = this.parentElement.querySelector('p').textContent;
+                    navigator.clipboard.writeText(text).then(() => {
+                        showToast('Copied to clipboard!');
+                    }).catch(() => {
+                        showToast('Failed to copy', 'error');
+                    });
+                });
+            });
+        }
+        
+        // Enhanced toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastContent = toast.querySelector('div');
+            
+            // Update toast appearance based on type
+            if (type === 'error') {
+                toast.className = 'fixed bottom-5 right-5 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg hidden toast';
+            } else {
+                toast.className = 'fixed bottom-5 right-5 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg hidden toast';
+            }
+            
+            toastContent.textContent = message;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+        
+        // Dark mode toggle (simplified for demo)
+        document.querySelector('footer button:nth-child(2)').addEventListener('click', function() {
+            document.body.classList.toggle('dark');
+            const icon = this.querySelector('i');
+            if (document.body.classList.contains('dark')) {
+                icon.setAttribute('data-feather', 'sun');
+            } else {
+                icon.setAttribute('data-feather', 'moon');
+            }
+            feather.replace();
+        });
+    </script>
+</body>
+</html>
