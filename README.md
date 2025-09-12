@@ -8,8 +8,6 @@
 
 SMELS is an intelligent error log analyzer that uses AI to understand and provide actionable insights for errors across multiple programming languages including Rust, JavaScript/TypeScript, Python, and Java.
 
-SMELS is an intelligent error log analyzer that uses AI to understand and provide actionable insights for errors across multiple programming languages including Rust, JavaScript/TypeScript, Python, and Java.
-
 ## ✨ Features
 
 - **Multi-language Support**: Automatically detects and analyzes errors from Rust, JavaScript, Python, Java, and more
