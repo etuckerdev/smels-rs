@@ -1,6 +1,6 @@
-use crate::{Parser, ErrorInfo};
-use regex::Regex;
+use crate::{ErrorInfo, Parser};
 use lazy_static::lazy_static;
+use regex::Regex;
 
 lazy_static! {
     static ref GO_ERROR_PATTERNS: Vec<(&'static str, &'static str)> = vec![
@@ -14,14 +14,8 @@ lazy_static! {
         (r"import cycle", "Import cycle detected"),
         (r"build failed", "Build failure"),
     ];
-
-    static ref GO_LOCATION_RE: Regex = Regex::new(
-        r"([^:\s]+\.go):(\d+):?(\d+)?"
-    ).unwrap();
-
-    static ref GO_STACK_FRAME_RE: Regex = Regex::new(
-        r"([^:]+)\.go:(\d+)\s+\+0x[0-9a-f]+"
-    ).unwrap();
+    static ref GO_LOCATION_RE: Regex = Regex::new(r"([^:\s]+\.go):(\d+):?(\d+)?").unwrap();
+    static ref GO_STACK_FRAME_RE: Regex = Regex::new(r"([^:]+)\.go:(\d+)\s+\+0x[0-9a-f]+").unwrap();
 }
 
 pub struct GoParser;

@@ -29,7 +29,7 @@ impl Colors {
     pub const MAGENTA: &'static str = "\x1b[35m";
     pub const CYAN: &'static str = "\x1b[36m";
     pub const WHITE: &'static str = "\x1b[37m";
-    
+
     // Background colors
     pub const BG_RED: &'static str = "\x1b[41m";
     pub const BG_GREEN: &'static str = "\x1b[42m";
@@ -59,28 +59,28 @@ pub fn format_result_json(result: &AnalysisResult) -> String {
 // Default format (your original implementation)
 pub fn format_default(result: &AnalysisResult) -> String {
     let mut output = format!("Summary: {}\n", result.summary);
-    
+
     if !result.root_causes.is_empty() {
         output.push_str("Root causes:\n");
         for cause in &result.root_causes {
             output.push_str(&format!("- {}\n", cause));
         }
     }
-    
+
     if !result.fixes.is_empty() {
         output.push_str("Fixes:\n");
         for fix in &result.fixes {
             output.push_str(&format!("- {}\n", fix));
         }
     }
-    
+
     if !result.related.is_empty() {
         output.push_str("Related:\n");
         for rel in &result.related {
             output.push_str(&format!("- {}\n", rel));
         }
     }
-    
+
     output
 }
 
@@ -88,19 +88,21 @@ pub fn format_default(result: &AnalysisResult) -> String {
 pub fn format_compact(result: &AnalysisResult) -> String {
     let cause_count = result.root_causes.len();
     let fix_count = result.fixes.len();
-    
-    format!("{} ({} causes, {} fixes)", 
-        result.summary, cause_count, fix_count)
+
+    format!(
+        "{} ({} causes, {} fixes)",
+        result.summary, cause_count, fix_count
+    )
 }
 
 // Verbose format with numbered items and additional details
 pub fn format_verbose(result: &AnalysisResult) -> String {
     let mut output = String::new();
-    
+
     // Header
     output.push_str("=== SMELS Error Analysis ===\n\n");
     output.push_str(&format!("Summary: {}\n\n", result.summary));
-    
+
     // Root causes with numbering
     if !result.root_causes.is_empty() {
         output.push_str("Root Causes:\n");
@@ -109,7 +111,7 @@ pub fn format_verbose(result: &AnalysisResult) -> String {
         }
         output.push('\n');
     }
-    
+
     // Fixes with numbering and priority indicators
     if !result.fixes.is_empty() {
         output.push_str("Recommended Fixes:\n");
@@ -119,7 +121,7 @@ pub fn format_verbose(result: &AnalysisResult) -> String {
         }
         output.push('\n');
     }
-    
+
     // Related links
     if !result.related.is_empty() {
         output.push_str("Related Documentation:\n");
@@ -128,7 +130,7 @@ pub fn format_verbose(result: &AnalysisResult) -> String {
         }
         output.push('\n');
     }
-    
+
     output.push_str("=== End Analysis ===\n");
     output
 }
@@ -148,10 +150,10 @@ pub fn format_json_pretty(result: &AnalysisResult) -> String {
 // Markdown format for documentation/web display
 pub fn format_markdown(result: &AnalysisResult) -> String {
     let mut output = String::new();
-    
+
     output.push_str("# Error Analysis\n\n");
     output.push_str(&format!("**Summary:** {}\n\n", result.summary));
-    
+
     if !result.root_causes.is_empty() {
         output.push_str("## Root Causes\n\n");
         for cause in &result.root_causes {
@@ -159,7 +161,7 @@ pub fn format_markdown(result: &AnalysisResult) -> String {
         }
         output.push('\n');
     }
-    
+
     if !result.fixes.is_empty() {
         output.push_str("## Fixes\n\n");
         for fix in &result.fixes {
@@ -167,7 +169,7 @@ pub fn format_markdown(result: &AnalysisResult) -> String {
         }
         output.push('\n');
     }
-    
+
     if !result.related.is_empty() {
         output.push_str("## Related Links\n\n");
         for rel in &result.related {
@@ -178,14 +180,14 @@ pub fn format_markdown(result: &AnalysisResult) -> String {
             }
         }
     }
-    
+
     output
 }
 
 // HTML format for web display
 pub fn format_html(result: &AnalysisResult) -> String {
     let mut output = String::new();
-    
+
     output.push_str(r#"
 <!DOCTYPE html>
 <html>
@@ -208,10 +210,12 @@ pub fn format_html(result: &AnalysisResult) -> String {
 <body>
     <h1>SMELS Error Analysis</h1>
     "#);
-    
-    output.push_str(&format!(r#"<div class="summary"><strong>Summary:</strong> {}</div>"#, 
-        html_escape(&result.summary)));
-    
+
+    output.push_str(&format!(
+        r#"<div class="summary"><strong>Summary:</strong> {}</div>"#,
+        html_escape(&result.summary)
+    ));
+
     if !result.root_causes.is_empty() {
         output.push_str(r#"<div class="section causes"><h3>Root Causes</h3><ul>"#);
         for cause in &result.root_causes {
@@ -219,7 +223,7 @@ pub fn format_html(result: &AnalysisResult) -> String {
         }
         output.push_str("</ul></div>");
     }
-    
+
     if !result.fixes.is_empty() {
         output.push_str(r#"<div class="section fixes"><h3>Fixes</h3><ul>"#);
         for fix in &result.fixes {
@@ -227,20 +231,23 @@ pub fn format_html(result: &AnalysisResult) -> String {
         }
         output.push_str("</ul></div>");
     }
-    
+
     if !result.related.is_empty() {
         output.push_str(r#"<div class="section related"><h3>Related Links</h3><ul>"#);
         for rel in &result.related {
             if rel.starts_with("http") {
-                output.push_str(&format!(r#"<li><a href="{}" target="_blank">{}</a></li>"#, 
-                    html_escape(rel), html_escape(rel)));
+                output.push_str(&format!(
+                    r#"<li><a href="{}" target="_blank">{}</a></li>"#,
+                    html_escape(rel),
+                    html_escape(rel)
+                ));
             } else {
                 output.push_str(&format!("<li>{}</li>", html_escape(rel)));
             }
         }
         output.push_str("</ul></div>");
     }
-    
+
     output.push_str("</body></html>");
     output
 }
@@ -248,26 +255,34 @@ pub fn format_html(result: &AnalysisResult) -> String {
 // Terminal format with colors and icons
 pub fn format_terminal(result: &AnalysisResult) -> String {
     let mut output = String::new();
-    
+
     // Check if colors are supported
     let use_colors = supports_color();
-    
+
     // Summary with icon
     if use_colors {
-        output.push_str(&format!("{}📋 Summary:{} {}\n", 
-            Colors::BOLD, Colors::RESET, result.summary));
+        output.push_str(&format!(
+            "{}📋 Summary:{} {}\n",
+            Colors::BOLD,
+            Colors::RESET,
+            result.summary
+        ));
     } else {
         output.push_str(&format!("Summary: {}\n", result.summary));
     }
-    
+
     // Root causes
     if !result.root_causes.is_empty() {
         if use_colors {
-            output.push_str(&format!("{}⚠️  Root causes:{}\n", Colors::YELLOW, Colors::RESET));
+            output.push_str(&format!(
+                "{}⚠️  Root causes:{}\n",
+                Colors::YELLOW,
+                Colors::RESET
+            ));
         } else {
             output.push_str("Root causes:\n");
         }
-        
+
         for cause in &result.root_causes {
             if use_colors {
                 output.push_str(&format!("  {}•{} {}\n", Colors::RED, Colors::RESET, cause));
@@ -276,7 +291,7 @@ pub fn format_terminal(result: &AnalysisResult) -> String {
             }
         }
     }
-    
+
     // Fixes
     if !result.fixes.is_empty() {
         if use_colors {
@@ -284,7 +299,7 @@ pub fn format_terminal(result: &AnalysisResult) -> String {
         } else {
             output.push_str("Fixes:\n");
         }
-        
+
         for fix in &result.fixes {
             if use_colors {
                 output.push_str(&format!("  {}•{} {}\n", Colors::GREEN, Colors::RESET, fix));
@@ -293,7 +308,7 @@ pub fn format_terminal(result: &AnalysisResult) -> String {
             }
         }
     }
-    
+
     // Related links
     if !result.related.is_empty() {
         if use_colors {
@@ -301,17 +316,23 @@ pub fn format_terminal(result: &AnalysisResult) -> String {
         } else {
             output.push_str("Related:\n");
         }
-        
+
         for rel in &result.related {
             if use_colors {
-                output.push_str(&format!("  {}•{} {}{}{}\n", 
-                    Colors::BLUE, Colors::RESET, Colors::CYAN, rel, Colors::RESET));
+                output.push_str(&format!(
+                    "  {}•{} {}{}{}\n",
+                    Colors::BLUE,
+                    Colors::RESET,
+                    Colors::CYAN,
+                    rel,
+                    Colors::RESET
+                ));
             } else {
                 output.push_str(&format!("- {}\n", rel));
             }
         }
     }
-    
+
     output
 }
 
@@ -328,19 +349,19 @@ impl Template {
             variables: HashMap::new(),
         }
     }
-    
+
     pub fn set_variable(&mut self, key: &str, value: &str) {
         self.variables.insert(key.to_string(), value.to_string());
     }
-    
+
     pub fn render(&self, result: &AnalysisResult) -> String {
         let mut output = self.template.clone();
-        
+
         // Replace built-in variables
         output = output.replace("{{summary}}", &result.summary);
         output = output.replace("{{cause_count}}", &result.root_causes.len().to_string());
         output = output.replace("{{fix_count}}", &result.fixes.len().to_string());
-        
+
         // Replace causes list
         if result.root_causes.is_empty() {
             output = output.replace("{{causes}}", "None identified");
@@ -348,7 +369,7 @@ impl Template {
             let causes = result.root_causes.join(", ");
             output = output.replace("{{causes}}", &causes);
         }
-        
+
         // Replace fixes list
         if result.fixes.is_empty() {
             output = output.replace("{{fixes}}", "No fixes available");
@@ -356,12 +377,12 @@ impl Template {
             let fixes = result.fixes.join(" | ");
             output = output.replace("{{fixes}}", &fixes);
         }
-        
+
         // Replace custom variables
         for (key, value) in &self.variables {
             output = output.replace(&format!("{{{{{}}}}}", key), value);
         }
-        
+
         output
     }
 }
@@ -378,9 +399,11 @@ fn html_escape(input: &str) -> String {
 
 fn supports_color() -> bool {
     // Simple check for color support
-    std::env::var("NO_COLOR").is_err() && 
-    (std::env::var("TERM").map(|term| term != "dumb").unwrap_or(false) ||
-     std::env::var("COLORTERM").is_ok())
+    std::env::var("NO_COLOR").is_err()
+        && (std::env::var("TERM")
+            .map(|term| term != "dumb")
+            .unwrap_or(false)
+            || std::env::var("COLORTERM").is_ok())
 }
 
 // Formatting shortcuts
@@ -417,27 +440,27 @@ impl ResponseBuilder {
             max_items: None,
         }
     }
-    
+
     pub fn format(mut self, format: OutputFormat) -> Self {
         self.format = format;
         self
     }
-    
+
     pub fn template(mut self, template: Template) -> Self {
         self.template = Some(template);
         self
     }
-    
+
     pub fn include_metadata(mut self) -> Self {
         self.include_metadata = true;
         self
     }
-    
+
     pub fn limit_items(mut self, max: usize) -> Self {
         self.max_items = Some(max);
         self
     }
-    
+
     pub fn build(self, result: &AnalysisResult) -> String {
         let mut limited_result = result.clone();
 
@@ -452,17 +475,20 @@ impl ResponseBuilder {
         if let Some(template) = &self.template {
             return template.render(&limited_result);
         }
-        
+
         // Otherwise use format
         let mut output = format_result(&limited_result, self.format);
-        
+
         // Add metadata if requested
         if self.include_metadata {
             output.push_str(&format!("\n--- Metadata ---\n"));
-            output.push_str(&format!("Generated: {}\n", chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC")));
+            output.push_str(&format!(
+                "Generated: {}\n",
+                chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC")
+            ));
             output.push_str(&format!("Version: SMELS v{}\n", env!("CARGO_PKG_VERSION")));
         }
-        
+
         output
     }
 }
@@ -476,7 +502,7 @@ impl Default for ResponseBuilder {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     fn sample_result() -> AnalysisResult {
         AnalysisResult {
             summary: "Test error detected".to_string(),
@@ -485,7 +511,7 @@ mod tests {
             related: vec!["https://example.com".to_string()],
         }
     }
-    
+
     #[test]
     fn test_default_format() {
         let result = sample_result();
@@ -494,31 +520,31 @@ mod tests {
         assert!(output.contains("- Cause 1"));
         assert!(output.contains("- Fix 1"));
     }
-    
+
     #[test]
     fn test_compact_format() {
         let result = sample_result();
         let output = format_compact(&result);
         assert!(output.contains("Test error detected (2 causes, 2 fixes)"));
     }
-    
+
     #[test]
     fn test_json_format() {
         let result = sample_result();
         let output = format_json(&result);
         assert!(output.contains("\"summary\":\"Test error detected\""));
     }
-    
+
     #[test]
     fn test_template_system() {
         let result = sample_result();
         let mut template = Template::new("Error: {{summary}} with {{cause_count}} causes");
         template.set_variable("custom", "test");
-        
+
         let output = template.render(&result);
         assert_eq!(output, "Error: Test error detected with 2 causes");
     }
-    
+
     #[test]
     fn test_response_builder() {
         let result = sample_result();
@@ -526,7 +552,7 @@ mod tests {
             .format(OutputFormat::Compact)
             .limit_items(1)
             .build(&result);
-        
+
         assert!(output.contains("Test error detected (1 causes, 1 fixes)"));
     }
 }

@@ -1,4 +1,8 @@
-use smels::{Analyzer, parsers::{GenericParser, rust::RustParser, js::JsParser}, rules::common::CommonRule};
+use smels::{
+    parsers::{js::JsParser, rust::RustParser, GenericParser},
+    rules::common::CommonRule,
+    Analyzer,
+};
 
 #[tokio::test]
 async fn test_rust_panic_analysis() {
@@ -10,7 +14,11 @@ async fn test_rust_panic_analysis() {
     let input = format!("thread 'main' panicked at 'called Option::unwrap() on a None value', src/main.rs:10:5 - {}", std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos());
     let result = analyzer.analyze(&input).await;
 
-    assert!(result.summary.contains("panic") || result.summary.contains("error") || result.summary.contains("Detected"));
+    assert!(
+        result.summary.contains("panic")
+            || result.summary.contains("error")
+            || result.summary.contains("Detected")
+    );
     assert!(!result.root_causes.is_empty());
     assert!(!result.fixes.is_empty());
 }
@@ -22,7 +30,13 @@ async fn test_javascript_module_error() {
     analyzer.add_parser(Box::new(JsParser));
     analyzer.add_rule(Box::new(CommonRule));
 
-    let input = format!("Error: Cannot find module 'express' at Function.Module._resolveFilename - {}", std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos());
+    let input = format!(
+        "Error: Cannot find module 'express' at Function.Module._resolveFilename - {}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    );
     let result = analyzer.analyze(&input).await;
 
     assert!(result.summary.contains("error") || result.summary.contains("module"));
@@ -35,11 +49,20 @@ async fn test_port_conflict_error() {
     analyzer.add_parser(Box::new(GenericParser));
     analyzer.add_rule(Box::new(CommonRule));
 
-    let input = format!("Error: listen EADDRINUSE: address already in use :::3000 - {}", std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos());
+    let input = format!(
+        "Error: listen EADDRINUSE: address already in use :::3000 - {}",
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    );
     let result = analyzer.analyze(&input).await;
 
     assert!(result.summary.contains("error") || result.summary.contains("port"));
-    assert!(result.fixes.iter().any(|f| f.contains("port") || f.contains("kill")));
+    assert!(result
+        .fixes
+        .iter()
+        .any(|f| f.contains("port") || f.contains("kill")));
 }
 
 #[tokio::test]
