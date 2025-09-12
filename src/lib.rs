@@ -23,12 +23,15 @@ pub mod web;
 /// ```rust
 /// use smels::{Analyzer, parsers::{GenericParser, rust::RustParser}};
 ///
+/// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
 /// let mut analyzer = Analyzer::new();
 /// analyzer.add_parser(Box::new(GenericParser));
 /// analyzer.add_parser(Box::new(RustParser));
 ///
-/// let result = analyzer.analyze("thread 'main' panicked at 'called Option::unwrap() on a None value'");
+/// let result = analyzer.analyze("thread 'main' panicked at 'called Option::unwrap() on a None value'").await;
 /// println!("Summary: {}", result.summary);
+/// # Ok(())
+/// # }
 /// ```
 
 // Parser traits
