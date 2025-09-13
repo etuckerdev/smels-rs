@@ -44,8 +44,8 @@ impl Parser for GoParser {
         }
 
         // Generic Go error detection
-        if input.contains("go:") || input.contains("go.mod") || input.contains("go.sum") {
-            if errors.is_empty() && (input.contains("error") || input.contains("failed")) {
+        if (input.contains("go:") || input.contains("go.mod") || input.contains("go.sum"))
+            && errors.is_empty() && (input.contains("error") || input.contains("failed")) {
                 let location = self.extract_location(input);
                 errors.push(ErrorInfo {
                     message: "Go build or runtime error".to_string(),
@@ -53,7 +53,6 @@ impl Parser for GoParser {
                     language: "go".to_string(),
                 });
             }
-        }
 
         errors
     }
@@ -69,7 +68,7 @@ impl GoParser {
             if let Some(col) = caps.get(3) {
                 return Some(format!("{}:{}:{}", file, line, col.as_str()));
             } else {
-                return Some(format!("{}:{}", file, line));
+                return Some(format!("{file}:{line}"));
             }
         }
 
@@ -77,7 +76,7 @@ impl GoParser {
         if let Some(caps) = GO_STACK_FRAME_RE.captures(input) {
             let file = caps.get(1)?.as_str();
             let line = caps.get(2)?.as_str();
-            return Some(format!("{}:{}", file, line));
+            return Some(format!("{file}:{line}"));
         }
 
         None

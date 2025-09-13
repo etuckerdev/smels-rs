@@ -54,7 +54,7 @@ pub fn generate_teaching_prompt(
     if let Some(first_error) = errors.first() {
         prompt.push_str(&format!("Language: {}\n", first_error.language));
         if let Some(location) = &first_error.location {
-            prompt.push_str(&format!("Location: {}\n", location));
+            prompt.push_str(&format!("Location: {location}\n"));
         }
     }
 
@@ -93,7 +93,7 @@ fn get_teaching_system_message(vibe: &VibeMode) -> String {
         SkillLevel::Expert => " The student has deep expertise. Discuss advanced patterns, performance implications, and design trade-offs.",
     };
 
-    format!("{}{}", base_teacher, skill_adaptation)
+    format!("{base_teacher}{skill_adaptation}")
 }
 
 fn get_learning_objectives(_analysis: &AnalysisResult, vibe: &VibeMode) -> String {

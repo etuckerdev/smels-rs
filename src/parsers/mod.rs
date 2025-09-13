@@ -184,7 +184,7 @@ impl GenericParser {
             let error_type = self.classify_error_type(input);
 
             return Some(ErrorInfo {
-                message: format!("Generic {} detected", error_type),
+                message: format!("Generic {error_type} detected"),
                 location,
                 language: "unknown".to_string(),
             });
@@ -196,7 +196,7 @@ impl GenericParser {
             if input.to_lowercase().contains(word) {
                 let location = self.extract_generic_location(input);
                 return Some(ErrorInfo {
-                    message: format!("Possible error detected: contains '{}'", word),
+                    message: format!("Possible error detected: contains '{word}'"),
                     location,
                     language: "unknown".to_string(),
                 });
@@ -215,7 +215,7 @@ impl GenericParser {
             if let Some(col) = caps.get(3) {
                 return Some(format!("{}:{}:{}", file, line, col.as_str()));
             } else {
-                return Some(format!("{}:{}", file, line));
+                return Some(format!("{file}:{line}"));
             }
         }
 

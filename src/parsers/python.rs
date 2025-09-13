@@ -237,7 +237,7 @@ impl PythonParser {
         if let Some(caps) = LOCATION_RE.captures(input) {
             let file = caps.get(1)?.as_str();
             let line = caps.get(2)?.as_str();
-            return Some(format!("{}:{}", file, line));
+            return Some(format!("{file}:{line}"));
         }
 
         None

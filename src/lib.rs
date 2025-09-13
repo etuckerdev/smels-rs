@@ -6,33 +6,32 @@ pub mod templates;
 #[cfg(feature = "web")]
 pub mod web;
 
-/// # SMELS - AI-Powered Error Log Analyzer
-///
-/// SMELS is an intelligent error log analyzer that uses AI to understand and provide
-/// actionable insights for errors across multiple programming languages.
-///
-/// ## Features
-///
-/// - **Multi-language Support**: Automatically detects and analyzes errors from Rust, JavaScript, Python, Java, and Go
-/// - **AI-Powered Analysis**: Uses local AI models for intelligent summaries and root cause analysis
-/// - **Actionable Fixes**: Provides specific solutions for common error patterns
-/// - **Curated Documentation**: Includes relevant documentation links
-///
-/// ## Example
-///
-/// ```rust
-/// use smels::{Analyzer, parsers::{GenericParser, rust::RustParser}};
-///
-/// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
-/// let mut analyzer = Analyzer::new();
-/// analyzer.add_parser(Box::new(GenericParser));
-/// analyzer.add_parser(Box::new(RustParser));
-///
-/// let result = analyzer.analyze("thread 'main' panicked at 'called Option::unwrap() on a None value'").await;
-/// println!("Summary: {}", result.summary);
-/// # Ok(())
-/// # }
-/// ```
+// /// # SMELS - AI-Powered Error Log Analyzer
+// ///
+// /// SMELS is an intelligent error log analyzer that uses AI to understand and provide
+// /// actionable insights for errors across multiple programming languages.
+// ///
+// /// ## Features
+// ///
+// /// - **Multi-language Support**: Automatically detects and analyzes errors from Rust, JavaScript, Python, Java, and Go
+// /// - **AI-Powered Analysis**: Uses local AI models for intelligent summaries and root cause analysis
+// /// - **Actionable Fixes**: Provides specific solutions for common error patterns
+// /// - **Curated Documentation**: Includes relevant documentation links
+// ///
+// /// ## Example
+// ///
+
+// /// use smels::{Analyzer, parsers::{GenericParser, rust::RustParser}};
+// ///
+// /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+// /// let mut analyzer = Analyzer::new();
+// /// analyzer.add_parser(Box::new(GenericParser));
+// /// analyzer.add_parser(Box::new(RustParser));
+// ///
+// /// let result = analyzer.analyze("thread 'main' panicked at 'called Option::unwrap() on a None value'").await;
+// /// println!("Summary: {}", result.summary);
+// /// # Ok(())
+// /// # }
 
 // Parser traits
 /// Trait for parsing error messages from different sources
@@ -117,6 +116,12 @@ pub struct Analyzer {
     rules: Vec<Box<dyn rules::Rule>>,
     use_ai: bool,
     cache: HashMap<String, CacheEntry>,
+}
+
+impl Default for Analyzer {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Analyzer {
@@ -223,13 +228,11 @@ impl Analyzer {
                 .map(|p| p.to_string())
                 .unwrap_or_else(|| "<port>".into());
             fixes.push(format!(
-                "Identify process using port: lsof -nP -iTCP:{} -sTCP:LISTEN",
-                port_hint
+                "Identify process using port: lsof -nP -iTCP:{port_hint} -sTCP:LISTEN"
             ));
             fixes.push("Kill process (Linux/macOS): kill -9 <PID> (verify first)".into());
             fixes.push(format!(
-                "Windows find process: netstat -ano | findstr :{}",
-                port_hint
+                "Windows find process: netstat -ano | findstr :{port_hint}"
             ));
             fixes.push("Windows kill: taskkill /PID <PID> /F".into());
             fixes.push(
@@ -317,7 +320,7 @@ impl Analyzer {
                     result.related = self.get_curated_links(&signal, &result.root_causes);
                 }
                 Err(e) => {
-                    eprintln!("AI unavailable; using deterministic analysis ({})", e);
+                    eprintln!("AI unavailable; using deterministic analysis ({e})");
                     result.related = self.get_curated_links(&signal, &result.root_causes);
                 }
             }
@@ -358,21 +361,21 @@ impl Analyzer {
         prompt.push_str(&format!("Primary message: {}\n", signal.message));
 
         if let Some(frame) = &signal.top_frame {
-            prompt.push_str(&format!("Top frame: {}\n", frame));
+            prompt.push_str(&format!("Top frame: {frame}\n"));
         }
 
         if let Some(errno) = &signal.errno {
-            prompt.push_str(&format!("Error code: {}\n", errno));
+            prompt.push_str(&format!("Error code: {errno}\n"));
         }
 
         if !signal.top_frames.is_empty() {
             prompt.push_str("Stack frames:\n");
             for frame in &signal.top_frames {
-                prompt.push_str(&format!("- {}\n", frame));
+                prompt.push_str(&format!("- {frame}\n"));
             }
         }
 
-        prompt.push_str(&format!("Full input: {}\n", input));
+        prompt.push_str(&format!("Full input: {input}\n"));
 
         // Add known patterns based on error type
         for err in errors {

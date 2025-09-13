@@ -299,7 +299,7 @@ impl CsharpParser {
             let file = caps.get(1)?.as_str();
             let line = caps.get(2)?.as_str();
             let col = caps.get(3)?.as_str();
-            return Some(format!("{}:{}:{}", file, line, col));
+            return Some(format!("{file}:{line}:{col}"));
         }
 
         // Try simpler format: File.cs:line:column
@@ -310,7 +310,7 @@ impl CsharpParser {
             if let Some(col) = caps.get(3) {
                 return Some(format!("{}:{}:{}", file, line, col.as_str()));
             } else {
-                return Some(format!("{}:{}", file, line));
+                return Some(format!("{file}:{line}"));
             }
         }
 

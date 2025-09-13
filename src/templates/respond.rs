@@ -63,21 +63,21 @@ pub fn format_default(result: &AnalysisResult) -> String {
     if !result.root_causes.is_empty() {
         output.push_str("Root causes:\n");
         for cause in &result.root_causes {
-            output.push_str(&format!("- {}\n", cause));
+            output.push_str(&format!("- {cause}\n"));
         }
     }
 
     if !result.fixes.is_empty() {
         output.push_str("Fixes:\n");
         for fix in &result.fixes {
-            output.push_str(&format!("- {}\n", fix));
+            output.push_str(&format!("- {fix}\n"));
         }
     }
 
     if !result.related.is_empty() {
         output.push_str("Related:\n");
         for rel in &result.related {
-            output.push_str(&format!("- {}\n", rel));
+            output.push_str(&format!("- {rel}\n"));
         }
     }
 
@@ -157,7 +157,7 @@ pub fn format_markdown(result: &AnalysisResult) -> String {
     if !result.root_causes.is_empty() {
         output.push_str("## Root Causes\n\n");
         for cause in &result.root_causes {
-            output.push_str(&format!("- {}\n", cause));
+            output.push_str(&format!("- {cause}\n"));
         }
         output.push('\n');
     }
@@ -165,7 +165,7 @@ pub fn format_markdown(result: &AnalysisResult) -> String {
     if !result.fixes.is_empty() {
         output.push_str("## Fixes\n\n");
         for fix in &result.fixes {
-            output.push_str(&format!("- {}\n", fix));
+            output.push_str(&format!("- {fix}\n"));
         }
         output.push('\n');
     }
@@ -174,9 +174,9 @@ pub fn format_markdown(result: &AnalysisResult) -> String {
         output.push_str("## Related Links\n\n");
         for rel in &result.related {
             if rel.starts_with("http") {
-                output.push_str(&format!("- [Link]({})\n", rel));
+                output.push_str(&format!("- [Link]({rel})\n"));
             } else {
-                output.push_str(&format!("- {}\n", rel));
+                output.push_str(&format!("- {rel}\n"));
             }
         }
     }
@@ -287,7 +287,7 @@ pub fn format_terminal(result: &AnalysisResult) -> String {
             if use_colors {
                 output.push_str(&format!("  {}•{} {}\n", Colors::RED, Colors::RESET, cause));
             } else {
-                output.push_str(&format!("- {}\n", cause));
+                output.push_str(&format!("- {cause}\n"));
             }
         }
     }
@@ -304,7 +304,7 @@ pub fn format_terminal(result: &AnalysisResult) -> String {
             if use_colors {
                 output.push_str(&format!("  {}•{} {}\n", Colors::GREEN, Colors::RESET, fix));
             } else {
-                output.push_str(&format!("- {}\n", fix));
+                output.push_str(&format!("- {fix}\n"));
             }
         }
     }
@@ -328,7 +328,7 @@ pub fn format_terminal(result: &AnalysisResult) -> String {
                     Colors::RESET
                 ));
             } else {
-                output.push_str(&format!("- {}\n", rel));
+                output.push_str(&format!("- {rel}\n"));
             }
         }
     }
@@ -380,7 +380,7 @@ impl Template {
 
         // Replace custom variables
         for (key, value) in &self.variables {
-            output = output.replace(&format!("{{{{{}}}}}", key), value);
+            output = output.replace(&format!("{{{{{key}}}}}"), value);
         }
 
         output
@@ -481,7 +481,7 @@ impl ResponseBuilder {
 
         // Add metadata if requested
         if self.include_metadata {
-            output.push_str(&format!("\n--- Metadata ---\n"));
+            output.push_str("\n--- Metadata ---\n");
             output.push_str(&format!(
                 "Generated: {}\n",
                 chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC")

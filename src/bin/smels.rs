@@ -18,14 +18,14 @@ async fn main() {
     let command = &args[1];
     if command == "--help" || command == "-h" {
         println!("SMELS - Smart Error Log Extraction and Summarization");
-        println!("");
+        println!();
         println!("Usage:");
         println!("  smels analyze [--ai|--no-ai] [--ai-debug] [--json] [--web] [-f file] [--lang language]");
         println!("  smels analyze < input");
-        println!("");
+        println!();
         println!("Commands:");
         println!("  analyze    Analyze error logs from stdin or file");
-        println!("");
+        println!();
         println!("Options:");
         println!("  --ai       Enable AI-powered analysis (default: disabled)");
         println!("  --no-ai    Disable AI-powered analysis");
@@ -39,7 +39,7 @@ async fn main() {
     }
 
     if command != "analyze" {
-        eprintln!("Unknown command: {}", command);
+        eprintln!("Unknown command: {command}");
         eprintln!("Run 'smels --help' for usage information");
         return;
     }
@@ -111,7 +111,7 @@ async fn main() {
         // Get input from file or stdin for analysis
         if let Some(filename) = file {
             std::fs::read_to_string(&filename).unwrap_or_else(|_| {
-                eprintln!("Failed to read file: {}", filename);
+                eprintln!("Failed to read file: {filename}");
                 std::process::exit(1);
             })
         } else {
@@ -133,7 +133,7 @@ async fn main() {
                 Ok(_) => {
                     // Data available, read the rest
                     input.push(buffer[0] as char);
-                    if let Err(_) = stdin.read_to_string(&mut input) {
+                    if stdin.read_to_string(&mut input).is_err() {
                         eprintln!("Failed to read from stdin");
                         std::process::exit(1);
                     }

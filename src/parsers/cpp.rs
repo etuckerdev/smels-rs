@@ -298,7 +298,7 @@ impl CppParser {
                             caps.get(1).unwrap().as_str()
                         )
                     } else {
-                        format!("Warning - {}", description)
+                        format!("Warning - {description}")
                     };
 
                     errors.push(ErrorInfo {
@@ -344,7 +344,7 @@ impl CppParser {
             if let Some(col) = caps.get(3) {
                 return Some(format!("{}:{}:{}", file, line, col.as_str()));
             } else {
-                return Some(format!("{}:{}", file, line));
+                return Some(format!("{file}:{line}"));
             }
         }
 

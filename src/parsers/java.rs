@@ -126,7 +126,7 @@ impl JavaParser {
                 let root_cause = self.extract_root_cause(input);
 
                 let message = if let Some(cause) = root_cause {
-                    format!("{} ({})", description, cause)
+                    format!("{description} ({cause})")
                 } else {
                     description.to_string()
                 };
@@ -160,7 +160,7 @@ impl JavaParser {
             if re.is_match(input) {
                 let location = self.extract_location(input);
                 errors.push(ErrorInfo {
-                    message: format!("Compilation error: {}", description),
+                    message: format!("Compilation error: {description}"),
                     location,
                     language: "java".to_string(),
                 });
@@ -168,8 +168,8 @@ impl JavaParser {
         }
 
         // Generic compilation error patterns
-        if input.contains("javac") && input.contains("error:") {
-            if errors.is_empty() {
+        if input.contains("javac") && input.contains("error:")
+            && errors.is_empty() {
                 let location = self.extract_location(input);
                 errors.push(ErrorInfo {
                     message: "Java compilation failed".to_string(),
@@ -177,7 +177,6 @@ impl JavaParser {
                     language: "java".to_string(),
                 });
             }
-        }
 
         errors
     }
@@ -289,7 +288,7 @@ impl JavaParser {
         if let Some(caps) = LOCATION_RE.captures(input) {
             let file = caps.get(1)?.as_str();
             let line = caps.get(2)?.as_str();
-            return Some(format!("{}:{}", file, line));
+            return Some(format!("{file}:{line}"));
         }
 
         // Look in stack traces

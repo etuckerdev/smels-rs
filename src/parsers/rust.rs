@@ -87,7 +87,7 @@ impl RustParser {
             if re.is_match(input) {
                 let location = self.extract_location(input);
                 return Some(ErrorInfo {
-                    message: format!("Panic: {}", description),
+                    message: format!("Panic: {description}"),
                     location,
                     language: "rust".to_string(),
                 });
@@ -113,9 +113,9 @@ impl RustParser {
         for (pattern, description) in COMPILE_PATTERNS.iter() {
             let re = Regex::new(pattern).unwrap();
             for caps in re.captures_iter(input) {
-                let location = self.extract_location(&caps.get(0).unwrap().as_str());
+                let location = self.extract_location(caps.get(0).unwrap().as_str());
                 errors.push(ErrorInfo {
-                    message: format!("Compile error: {}", description),
+                    message: format!("Compile error: {description}"),
                     location,
                     language: "rust".to_string(),
                 });
@@ -123,8 +123,8 @@ impl RustParser {
         }
 
         // Generic error/warning detection
-        if input.contains("error[E") || input.contains("error:") {
-            if errors.is_empty() {
+        if (input.contains("error[E") || input.contains("error:"))
+            && errors.is_empty() {
                 let location = self.extract_location(input);
                 errors.push(ErrorInfo {
                     message: "Compilation error".to_string(),
@@ -132,7 +132,6 @@ impl RustParser {
                     language: "rust".to_string(),
                 });
             }
-        }
 
         errors
     }
@@ -177,7 +176,7 @@ impl RustParser {
             if let Some(col) = caps.get(3) {
                 return Some(format!("{}:{}:{}", file, line, col.as_str()));
             } else {
-                return Some(format!("{}:{}", file, line));
+                return Some(format!("{file}:{line}"));
             }
         }
 
@@ -185,7 +184,7 @@ impl RustParser {
         if let Some(caps) = STACK_FRAME_RE.captures(input) {
             let file = caps.get(2)?.as_str();
             let line = caps.get(3)?.as_str();
-            return Some(format!("{}:{}", file, line));
+            return Some(format!("{file}:{line}"));
         }
 
         None
@@ -206,9 +205,9 @@ impl RustParser {
                 // Check if next line has the location
                 let location = if i + 1 < lines.len() {
                     let next_line = lines[i + 1].trim();
-                    if next_line.starts_with("at ") {
-                        let loc_part = &next_line[3..]; // Remove "at "
-                        self.extract_location(&format!("at {}", loc_part))
+                    if let Some(loc_part) = next_line.strip_prefix("at ") {
+                        // Remove "at "
+                        self.extract_location(&format!("at {loc_part}"))
                     } else {
                         None
                     }
@@ -217,13 +216,13 @@ impl RustParser {
                 };
 
                 if let Some(loc) = location {
-                    frames.push(format!("{} ({})", func_part, loc));
+                    frames.push(format!("{func_part} ({loc})"));
                 } else {
                     // Try to extract location from current line
                     if let Some(caps) = FUNC_AT_LOC_RE.captures(line) {
                         let func = caps.get(1).unwrap().as_str();
                         let loc = caps.get(2).unwrap().as_str();
-                        frames.push(format!("{} ({})", func, loc));
+                        frames.push(format!("{func} ({loc})"));
                     }
                 }
 

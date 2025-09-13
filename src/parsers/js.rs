@@ -246,7 +246,7 @@ impl JsParser {
         if input.contains("EADDRINUSE") {
             let port = self.extract_port(input);
             let message = if let Some(p) = port {
-                format!("Port {} already in use", p)
+                format!("Port {p} already in use")
             } else {
                 "Port already in use".to_string()
             };
@@ -321,7 +321,7 @@ impl JsParser {
             if let Some(col) = caps.get(3) {
                 return Some(format!("{}:{}:{}", file, line, col.as_str()));
             } else {
-                return Some(format!("{}:{}", file, line));
+                return Some(format!("{file}:{line}"));
             }
         }
 
