@@ -1,8 +1,10 @@
-use std::io::{self, Read};
-use smels::Analyzer;
-use smels::parsers::{GenericParser, rust::RustParser, js::JsParser, python::PythonParser, java::JavaParser};
+use smels::parsers::{
+    java::JavaParser, js::JsParser, python::PythonParser, rust::RustParser, GenericParser,
+};
 use smels::rules::common::CommonRule;
 use smels::templates::respond;
+use smels::Analyzer;
+use std::io::{self, Read};
 
 #[tokio::main]
 async fn main() {
@@ -16,14 +18,14 @@ async fn main() {
     let command = &args[1];
     if command == "--help" || command == "-h" {
         println!("SMELS - Smart Error Log Extraction and Summarization");
-        println!("");
+        println!();
         println!("Usage:");
         println!("  smels analyze [--ai|--no-ai] [--ai-debug] [--json] [--web] [-f file] [--lang language]");
         println!("  smels analyze < input");
-        println!("");
+        println!();
         println!("Commands:");
         println!("  analyze    Analyze error logs from stdin or file");
-        println!("");
+        println!();
         println!("Options:");
         println!("  --ai       Enable AI-powered analysis (default: disabled)");
         println!("  --no-ai    Disable AI-powered analysis");
@@ -35,9 +37,9 @@ async fn main() {
         println!("  --help     Show this help message");
         return;
     }
-    
+
     if command != "analyze" {
-        eprintln!("Unknown command: {}", command);
+        eprintln!("Unknown command: {command}");
         eprintln!("Run 'smels --help' for usage information");
         return;
     }
@@ -96,7 +98,9 @@ async fn main() {
         }
     }
 
-    if ai_debug { unsafe { std::env::set_var("SMELS_AI_DEBUG", "1"); } }
+    if ai_debug {
+        std::env::set_var("SMELS_AI_DEBUG", "1");
+    }
 
     let input = if web_mode {
         // For web mode, we don't need input from stdin/file
@@ -105,7 +109,7 @@ async fn main() {
         // Get input from file or stdin for analysis
         if let Some(filename) = file {
             std::fs::read_to_string(&filename).unwrap_or_else(|_| {
-                eprintln!("Failed to read file: {}", filename);
+                eprintln!("Failed to read file: {filename}");
                 std::process::exit(1);
             })
         } else {
@@ -113,19 +117,21 @@ async fn main() {
             let mut input = String::new();
             let mut stdin = io::stdin();
             let mut buffer = [0; 1];
-            
+
             // Check if stdin has data available
             match stdin.read(&mut buffer) {
                 Ok(0) => {
                     // No data available
-                    eprintln!("No input provided. Use 'smels analyze < input' or 'smels analyze -f file'");
+                    eprintln!(
+                        "No input provided. Use 'smels analyze < input' or 'smels analyze -f file'"
+                    );
                     eprintln!("Run 'smels --help' for more information");
                     std::process::exit(1);
                 }
                 Ok(_) => {
                     // Data available, read the rest
                     input.push(buffer[0] as char);
-                    if let Err(_) = stdin.read_to_string(&mut input) {
+                    if stdin.read_to_string(&mut input).is_err() {
                         eprintln!("Failed to read from stdin");
                         std::process::exit(1);
                     }
@@ -143,7 +149,7 @@ async fn main() {
         // Start web server using the new web module
         println!("Starting web server at http://localhost:3001");
         println!("Press Ctrl+C to stop");
-        
+
         #[cfg(feature = "web")]
         {
             if let Err(e) = smels::web::start_web_server(3001).await {
@@ -151,10 +157,12 @@ async fn main() {
                 std::process::exit(1);
             }
         }
-        
+
         #[cfg(not(feature = "web"))]
         {
-            eprintln!("Web feature not enabled. Compile with --features web to enable web interface.");
+            eprintln!(
+                "Web feature not enabled. Compile with --features web to enable web interface."
+            );
             std::process::exit(1);
         }
     } else {
@@ -169,11 +177,14 @@ async fn main() {
         analyzer.add_rule(Box::new(CommonRule));
 
         let result = analyzer.analyze(&input).await;
-        
+
         if json_output {
             println!("{}", respond::format_result_json(&result));
         } else {
-            println!("{}", respond::format_result(&result, respond::OutputFormat::Default));
+            println!(
+                "{}",
+                respond::format_result(&result, respond::OutputFormat::Default)
+            );
         }
     }
 }

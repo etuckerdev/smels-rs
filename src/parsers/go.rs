@@ -1,6 +1,6 @@
-use crate::{Parser, ErrorInfo};
-use regex::Regex;
+use crate::{ErrorInfo, Parser};
 use lazy_static::lazy_static;
+use regex::Regex;
 
 lazy_static! {
     static ref GO_ERROR_PATTERNS: Vec<(&'static str, &'static str)> = vec![
@@ -14,14 +14,8 @@ lazy_static! {
         (r"import cycle", "Import cycle detected"),
         (r"build failed", "Build failure"),
     ];
-
-    static ref GO_LOCATION_RE: Regex = Regex::new(
-        r"([^:\s]+\.go):(\d+):?(\d+)?"
-    ).unwrap();
-
-    static ref GO_STACK_FRAME_RE: Regex = Regex::new(
-        r"([^:]+)\.go:(\d+)\s+\+0x[0-9a-f]+"
-    ).unwrap();
+    static ref GO_LOCATION_RE: Regex = Regex::new(r"([^:\s]+\.go):(\d+):?(\d+)?").unwrap();
+    static ref GO_STACK_FRAME_RE: Regex = Regex::new(r"([^:]+)\.go:(\d+)\s+\+0x[0-9a-f]+").unwrap();
 }
 
 pub struct GoParser;
@@ -50,15 +44,16 @@ impl Parser for GoParser {
         }
 
         // Generic Go error detection
-        if input.contains("go:") || input.contains("go.mod") || input.contains("go.sum") {
-            if errors.is_empty() && (input.contains("error") || input.contains("failed")) {
-                let location = self.extract_location(input);
-                errors.push(ErrorInfo {
-                    message: "Go build or runtime error".to_string(),
-                    location,
-                    language: "go".to_string(),
-                });
-            }
+        if (input.contains("go:") || input.contains("go.mod") || input.contains("go.sum"))
+            && errors.is_empty()
+            && (input.contains("error") || input.contains("failed"))
+        {
+            let location = self.extract_location(input);
+            errors.push(ErrorInfo {
+                message: "Go build or runtime error".to_string(),
+                location,
+                language: "go".to_string(),
+            });
         }
 
         errors
@@ -75,7 +70,7 @@ impl GoParser {
             if let Some(col) = caps.get(3) {
                 return Some(format!("{}:{}:{}", file, line, col.as_str()));
             } else {
-                return Some(format!("{}:{}", file, line));
+                return Some(format!("{file}:{line}"));
             }
         }
 
@@ -83,7 +78,7 @@ impl GoParser {
         if let Some(caps) = GO_STACK_FRAME_RE.captures(input) {
             let file = caps.get(1)?.as_str();
             let line = caps.get(2)?.as_str();
-            return Some(format!("{}:{}", file, line));
+            return Some(format!("{file}:{line}"));
         }
 
         None

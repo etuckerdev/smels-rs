@@ -8,7 +8,13 @@ use serde::{Deserialize, Serialize};
 use tower_http::cors::CorsLayer;
 use tower_http::services::ServeDir;
 
-use crate::{Analyzer, parsers::{GenericParser, rust::RustParser, js::JsParser, python::PythonParser, java::JavaParser}, rules::common::CommonRule};
+use crate::{
+    parsers::{
+        java::JavaParser, js::JsParser, python::PythonParser, rust::RustParser, GenericParser,
+    },
+    rules::common::CommonRule,
+    Analyzer,
+};
 
 #[derive(Deserialize)]
 pub struct AnalyzeRequest {
@@ -43,7 +49,8 @@ pub fn create_router() -> Router<()> {
 async fn serve_index() -> axum::response::Html<String> {
     match std::fs::read_to_string("src/web/index.html") {
         Ok(content) => axum::response::Html(content),
-        Err(_) => axum::response::Html(r#"
+        Err(_) => axum::response::Html(
+            r#"
 <!DOCTYPE html>
 <html>
 <head>
@@ -54,7 +61,9 @@ async fn serve_index() -> axum::response::Html<String> {
     <p>Error: Could not load index.html</p>
 </body>
 </html>
-        "#.to_string()),
+        "#
+            .to_string(),
+        ),
     }
 }
 
@@ -82,7 +91,7 @@ async fn analyze_error(
 
     // Create a new analyzer instance for this request
     let mut analyzer = Analyzer::new();
-    
+
     // Configure AI if requested
     if let Some(use_ai) = request.use_ai {
         analyzer = analyzer.with_ai(use_ai);
@@ -96,9 +105,9 @@ async fn analyze_error(
         analyzer.add_parser(Box::new(PythonParser));
         analyzer.add_parser(Box::new(JavaParser));
     }
-    analyzer.add_rule(Box::new(CommonRule));    // Perform analysis
+    analyzer.add_rule(Box::new(CommonRule)); // Perform analysis
     let result = analyzer.analyze(&request.error_text).await;
-    
+
     Ok(Json(AnalyzeResponse {
         summary: result.summary,
         root_causes: result.root_causes,

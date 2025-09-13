@@ -155,6 +155,23 @@ Related:
 
 Contributions are welcome! See our [Contributing Guide](CONTRIBUTING.md) for details.
 
+## 🛠️ Development
+
+### Pre-commit Checks
+
+This project includes automated quality checks that run before each commit:
+
+- **Clippy**: Catches common mistakes and suggests improvements
+- **Tests**: Ensures all functionality works correctly  
+- **Formatting**: Ensures consistent code style
+
+Run checks manually with:
+```bash
+./check.sh
+```
+
+See [PRE_COMMIT_CHECKS.md](PRE_COMMIT_CHECKS.md) for more details.
+
 ### Development Setup
 
 ```bash
