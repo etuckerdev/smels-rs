@@ -123,15 +123,14 @@ impl RustParser {
         }
 
         // Generic error/warning detection
-        if (input.contains("error[E") || input.contains("error:"))
-            && errors.is_empty() {
-                let location = self.extract_location(input);
-                errors.push(ErrorInfo {
-                    message: "Compilation error".to_string(),
-                    location,
-                    language: "rust".to_string(),
-                });
-            }
+        if (input.contains("error[E") || input.contains("error:")) && errors.is_empty() {
+            let location = self.extract_location(input);
+            errors.push(ErrorInfo {
+                message: "Compilation error".to_string(),
+                location,
+                language: "rust".to_string(),
+            });
+        }
 
         errors
     }

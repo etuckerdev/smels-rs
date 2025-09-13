@@ -168,15 +168,14 @@ impl JavaParser {
         }
 
         // Generic compilation error patterns
-        if input.contains("javac") && input.contains("error:")
-            && errors.is_empty() {
-                let location = self.extract_location(input);
-                errors.push(ErrorInfo {
-                    message: "Java compilation failed".to_string(),
-                    location,
-                    language: "java".to_string(),
-                });
-            }
+        if input.contains("javac") && input.contains("error:") && errors.is_empty() {
+            let location = self.extract_location(input);
+            errors.push(ErrorInfo {
+                message: "Java compilation failed".to_string(),
+                location,
+                language: "java".to_string(),
+            });
+        }
 
         errors
     }

@@ -45,14 +45,16 @@ impl Parser for GoParser {
 
         // Generic Go error detection
         if (input.contains("go:") || input.contains("go.mod") || input.contains("go.sum"))
-            && errors.is_empty() && (input.contains("error") || input.contains("failed")) {
-                let location = self.extract_location(input);
-                errors.push(ErrorInfo {
-                    message: "Go build or runtime error".to_string(),
-                    location,
-                    language: "go".to_string(),
-                });
-            }
+            && errors.is_empty()
+            && (input.contains("error") || input.contains("failed"))
+        {
+            let location = self.extract_location(input);
+            errors.push(ErrorInfo {
+                message: "Go build or runtime error".to_string(),
+                location,
+                language: "go".to_string(),
+            });
+        }
 
         errors
     }
