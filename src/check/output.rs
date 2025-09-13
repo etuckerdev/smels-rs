@@ -1,42 +1,65 @@
-use crate::check::{CheckResult, Severity};
+use crate::check::CheckResult;
 
 pub fn print_check_result(result: &CheckResult, strict: bool) {
+    // Show language breakdown
+    println!("📊 Analyzed {} files:", result.total_files);
+    for (lang, count) in &result.files_by_language {
+        let icon = match *lang {
+            "rust" => "🦀",
+            "javascript" => "📜",
+            "python" => "🐍",
+            "java" => "☕",
+            "go" => "🐹",
+            "c" => "⚙️",
+            "cpp" => "⚡",
+            "csharp" => "💎",
+            _ => "📄",
+        };
+        println!("  {icon} {lang} files: {count}");
+    }
+
     if result.passed {
-        println!("✅ All checks passed ({} files)", result.total_files);
+        println!("✅ All checks passed!");
         return;
     }
 
-    println!(
-        "❌ Found {} issues in {} files:",
-        result.issues.len(),
-        result.total_files
-    );
-
+    // Group issues by language
+    let mut issues_by_lang = std::collections::HashMap::new();
     for issue in &result.issues {
-        let location = match issue.line {
-            Some(line) => format!("{}:{}", issue.file.display(), line),
-            None => issue.file.display().to_string(),
+        issues_by_lang
+            .entry(&issue.language)
+            .or_insert(Vec::new())
+            .push(issue);
+    }
+
+    println!("\n❌ Found {} issues:", result.issues.len());
+    for (lang, issues) in issues_by_lang {
+        let icon = match lang.as_str() {
+            "rust" => "🦀",
+            "javascript" => "📜",
+            "python" => "🐍",
+            "java" => "☕",
+            "go" => "🐹",
+            "c" => "⚙️",
+            "cpp" => "⚡",
+            "csharp" => "💎",
+            _ => "📄",
         };
 
-        println!(
-            "  {} {} {}",
-            severity_icon(issue.severity.clone()),
-            location,
-            issue.message
-        );
+        println!("\n{} {} ({} issues):", icon, lang, issues.len());
+        for issue in issues {
+            println!(
+                "  🟠 {}:{} {}",
+                issue.file.display(),
+                issue.line.unwrap_or(0),
+                issue.message
+            );
+        }
     }
 
     if strict {
         println!("\n⚠️  Strict mode: build not recommended");
     } else {
         println!("\n💡 Run with --strict to fail CI on issues");
-    }
-}
-
-fn severity_icon(severity: Severity) -> &'static str {
-    match severity {
-        Severity::Critical => "🔴",
-        Severity::Error => "🟡",
-        Severity::Warning => "🟠",
     }
 }

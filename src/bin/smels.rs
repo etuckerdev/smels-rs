@@ -191,7 +191,7 @@ async fn main() {
             let checker = CodeChecker::new();
             let check_path = path.unwrap_or_else(|| PathBuf::from("."));
 
-            match checker.check_path(&check_path).await {
+            match checker.check_path(&check_path, _filter.as_deref()).await {
                 Ok(result) => {
                     match format {
                         OutputFormat::Json => {

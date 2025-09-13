@@ -1,33 +1,48 @@
+pub mod languages;
 pub mod output;
 pub mod patterns;
 
-use patterns::CheckPattern;
+use crate::check::languages::LanguageDetector;
+use crate::check::patterns::PatternRegistry;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 pub struct CodeChecker {
-    patterns: Vec<CheckPattern>,
+    patterns: PatternRegistry,
 }
 
 impl CodeChecker {
     pub fn new() -> Self {
         Self {
-            patterns: Self::load_check_patterns(),
+            patterns: PatternRegistry::new(),
         }
     }
 
-    pub async fn check_path(&self, path: &Path) -> Result<CheckResult, CheckError> {
-        let rust_files = self.find_rust_files(path)?;
+    pub async fn check_path(
+        &self,
+        path: &Path,
+        filter: Option<&str>,
+    ) -> Result<CheckResult, CheckError> {
+        let source_files = LanguageDetector::find_source_files(path, filter)?;
         let mut issues = Vec::new();
+        let mut files_by_language = HashMap::new();
 
-        for file in &rust_files {
-            let content = std::fs::read_to_string(file)?;
-            let file_issues = self.check_content(&content, file).await?;
+        // Group files by language for statistics
+        for (_file_path, language) in &source_files {
+            *files_by_language.entry(*language).or_insert(0) += 1;
+        }
+
+        // Check each file
+        for (file_path, language) in source_files.iter() {
+            let content = std::fs::read_to_string(file_path)?;
+            let file_issues = self.check_content(&content, file_path, language).await?;
             issues.extend(file_issues);
         }
 
         let passed = issues.is_empty();
         Ok(CheckResult {
-            total_files: rust_files.len(),
+            total_files: source_files.len(),
+            files_by_language,
             issues,
             passed,
         })
@@ -37,81 +52,20 @@ impl CodeChecker {
         &self,
         content: &str,
         file: &Path,
+        language: &str,
     ) -> Result<Vec<CheckIssue>, CheckError> {
         let mut issues = Vec::new();
 
-        // Proactive pattern checks
-        for pattern in &self.patterns {
-            if let Some(issue) = pattern.check(content, file)? {
-                issues.push(issue);
+        if let Some(patterns) = self.patterns.get_patterns(language) {
+            for pattern in patterns {
+                if let Some(mut issue) = pattern.check(content, file)? {
+                    issue.language = language.to_string();
+                    issues.push(issue);
+                }
             }
         }
 
         Ok(issues)
-    }
-
-    fn find_rust_files(&self, path: &Path) -> Result<Vec<PathBuf>, CheckError> {
-        let mut files = Vec::new();
-        Self::find_rust_files_recursive(path, &mut files)?;
-        Ok(files)
-    }
-
-    fn find_rust_files_recursive(path: &Path, files: &mut Vec<PathBuf>) -> Result<(), CheckError> {
-        if path.is_file() {
-            if path.extension().and_then(|s| s.to_str()) == Some("rs") {
-                files.push(path.to_path_buf());
-            }
-            return Ok(());
-        }
-
-        for entry in std::fs::read_dir(path)? {
-            let entry = entry?;
-            let path = entry.path();
-            if path.is_dir() {
-                // Skip common directories that shouldn't be checked
-                if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
-                    if name.starts_with('.') || name == "target" || name == "node_modules" {
-                        continue;
-                    }
-                }
-                Self::find_rust_files_recursive(&path, files)?;
-            } else if path.extension().and_then(|s| s.to_str()) == Some("rs") {
-                files.push(path);
-            }
-        }
-
-        Ok(())
-    }
-
-    fn load_check_patterns() -> Vec<CheckPattern> {
-        vec![
-            CheckPattern::new(
-                "unwrap_chain",
-                r"\.unwrap\(\)",
-                "Potential panic: .unwrap() call without error handling",
-            ),
-            CheckPattern::new(
-                "todo_macro",
-                r"todo!\(",
-                "Unfinished code: todo!() macro found",
-            ),
-            CheckPattern::new(
-                "panic_macro",
-                r"panic!\(",
-                "Explicit panic: panic!() macro found",
-            ),
-            CheckPattern::new(
-                "unreachable_code",
-                r"unreachable!\(",
-                "Unreachable code marker found",
-            ),
-            CheckPattern::new("unsafe_block", r"unsafe\s*\{", "Unsafe block usage"),
-            CheckPattern::new(
-                "expect_none",
-                r"\.expect\([^)]*\)",
-                "Potential panic: .expect() call that could fail",
-            ),
-        ]
     }
 }
 
@@ -124,6 +78,7 @@ impl Default for CodeChecker {
 #[derive(Debug, serde::Serialize)]
 pub struct CheckResult {
     pub total_files: usize,
+    pub files_by_language: std::collections::HashMap<&'static str, usize>,
     pub issues: Vec<CheckIssue>,
     pub passed: bool,
 }
@@ -135,6 +90,7 @@ pub struct CheckIssue {
     pub pattern: String,
     pub message: String,
     pub severity: Severity,
+    pub language: String,
 }
 
 #[derive(Debug, Clone, serde::Serialize)]
