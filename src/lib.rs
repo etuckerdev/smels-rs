@@ -419,7 +419,7 @@ impl Analyzer {
             // Extract a meaningful message from the input when no parsers are available
             if let Some(panic_match) = input.find("panicked at '") {
                 let start = panic_match + 13; // Length of "panicked at '"
-                if let Some(end) = input[start..].find("'") {
+                if let Some(end) = input[start..].find('\'') {
                     input[start..start + end].to_string()
                 } else {
                     "Unknown error".to_string()
