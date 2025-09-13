@@ -7,20 +7,18 @@ pub mod templates;
 #[cfg(feature = "web")]
 pub mod web;
 
-// /// # SMELS - Small Model Error Log Summarizer
-// ///
-// /// SMELS is an intelligent error log analyzer that uses small AI models to understand and provide
-// /// actionable insights for errors across multiple programming languages.
-// ///
-// /// ## Features
-// ///
-// /// - **Multi-language Support**: Automatically detects and analyzes errors from Rust, JavaScript, Python, Java, and Go
-// /// - **Small Model Analysis**: Uses local small AI models for intelligent summaries and root cause analysis
-// /// - **Actionable Fixes**: Provides specific solutions for common error patterns
-// /// - **Curated Documentation**: Includes relevant documentation links
-// ///
-// /// ## Example
-// ///
+/// # SMELS - AI-Powered Error Log Analyzer
+///
+/// SMELS is an intelligent error log analyzer that uses AI to understand and provide
+/// actionable insights for errors across multiple programming languages.
+///
+/// ## Features
+///
+/// - **Multi-language Support**: Automatically detects and analyzes errors from Rust, JavaScript, Python, Java, and Go
+/// - **AI-Powered Analysis**: Uses local AI models for intelligent summaries and root cause analysis
+/// - **Actionable Fixes**: Provides specific solutions for common error patterns
+/// - **Curated Documentation**: Includes relevant documentation links
+/// - **Code Quality Checks**: Integrated code quality analysis for multiple languages
 
 // /// use smels::{Analyzer, parsers::{GenericParser, rust::RustParser}};
 // ///
