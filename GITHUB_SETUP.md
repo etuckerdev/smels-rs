@@ -7,7 +7,7 @@ This guide will help you set up your SMELS repository on GitHub with all the nec
 1. Go to [GitHub.com](https://github.com) and sign in
 2. Click the "+" icon → "New repository"
 3. Repository name: `smels-rs`
-4. Description: "AI-powered error log analyzer for multiple programming languages"
+4. Description: "Small Model Error Log Summarizer for multiple programming languages"
 5. Make it **Public** (for open source)
 6. **DO NOT** initialize with README, .gitignore, or license (we already have these)
 7. Click "Create repository"

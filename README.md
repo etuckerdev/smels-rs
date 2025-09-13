@@ -1,4 +1,4 @@
-# SMELS - AI-Powered Error Log Analyzer
+# SMELS - Small Model Error Log Summarizer
 
 [![CI](https://github.com/etuckerdev/smels-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/etuckerdev/smels-rs/actions/workflows/ci.yml)
 [![Security Audit](https://github.com/etuckerdev/smels-rs/actions/workflows/security.yml/badge.svg)](https://github.com/etuckerdev/smels-rs/actions/workflows/security.yml)
@@ -6,12 +6,12 @@
 [![Documentation](https://docs.rs/smels/badge.svg)](https://docs.rs/smels)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-SMELS is an intelligent error log analyzer that uses AI to understand and provide actionable insights for errors across multiple programming languages including Rust, JavaScript/TypeScript, Python, and Java.
+SMELS is an intelligent error log analyzer that uses small AI models to understand and provide actionable insights for errors across multiple programming languages including Rust, JavaScript/TypeScript, Python, and Java.
 
 ## ✨ Features
 
 - **Multi-language Support**: Automatically detects and analyzes errors from Rust, JavaScript, Python, Java, and more
-- **AI-Powered Analysis**: Uses local AI models (via Ollama) to provide intelligent summaries and root cause analysis
+- **Small Model Analysis**: Uses local small AI models (via Ollama) to provide intelligent summaries and root cause analysis
 - **Actionable Fixes**: Provides specific, actionable solutions for common error patterns
 - **Curated Documentation Links**: Includes relevant documentation links for each error type
 - **Multiple Output Formats**: Text, JSON, and interactive web interface
@@ -63,7 +63,7 @@ echo "Error: listen EADDRINUSE: address already in use :::3000" | smels analyze
 smels analyze [OPTIONS] [INPUT]
 
 OPTIONS:
-    --ai                    Enable AI-powered analysis (requires Ollama)
+    --ai                    Enable small model analysis (requires Ollama)
     --no-ai                 Disable AI analysis (use deterministic rules only)
     --json                  Output results in JSON format
     --web                   Start web interface on localhost:3001
@@ -93,7 +93,7 @@ SMELS works out of the box with sensible defaults. For advanced usage:
 
 ### AI Setup (Optional)
 
-To enable AI-powered analysis:
+To enable small model analysis:
 
 1. Install [Ollama](https://ollama.ai/)
 2. Pull a code-focused model:

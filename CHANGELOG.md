@@ -8,9 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial release of SMELS - AI-powered error log analyzer
+- Initial release of SMELS - Small Model Error Log Summarizer
 - Multi-language support (Rust, JavaScript, Python, Java, Go, C++, C#)
-- AI-powered analysis using Ollama
+- Small model analysis using Ollama
 - Web interface with modern UI
 - CLI tool with multiple output formats (text, JSON, HTML, Markdown)
 - Caching system for performance optimization

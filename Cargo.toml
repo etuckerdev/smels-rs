@@ -2,7 +2,7 @@
 name = "smels"
 version = "0.1.0"
 edition = "2021"
-description = "AI-powered error log analyzer for multiple programming languages"
+description = "Small Model Error Log Summarizer for multiple programming languages"
 repository = "https://github.com/etuckerdev/smels-rs"
 license = "Apache-2.0"
 keywords = ["error-analysis", "debugging", "ai", "cli"]
@@ -20,6 +20,7 @@ lazy_static = "1.5.0"
 axum = { version = "0.7", features = ["json"], optional = true }
 tower = { version = "0.4", optional = true }
 tower-http = { version = "0.5", features = ["cors", "fs"], optional = true }
+clap = { version = "4.0", features = ["derive"] }
 
 [features]
 default = ["cli"]

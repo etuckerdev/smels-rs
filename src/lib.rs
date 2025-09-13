@@ -1,4 +1,5 @@
 pub mod ai;
+pub mod check;
 pub mod parsers;
 pub mod rules;
 pub mod templates;
@@ -6,15 +7,15 @@ pub mod templates;
 #[cfg(feature = "web")]
 pub mod web;
 
-// /// # SMELS - AI-Powered Error Log Analyzer
+// /// # SMELS - Small Model Error Log Summarizer
 // ///
-// /// SMELS is an intelligent error log analyzer that uses AI to understand and provide
+// /// SMELS is an intelligent error log analyzer that uses small AI models to understand and provide
 // /// actionable insights for errors across multiple programming languages.
 // ///
 // /// ## Features
 // ///
 // /// - **Multi-language Support**: Automatically detects and analyzes errors from Rust, JavaScript, Python, Java, and Go
-// /// - **AI-Powered Analysis**: Uses local AI models for intelligent summaries and root cause analysis
+// /// - **Small Model Analysis**: Uses local small AI models for intelligent summaries and root cause analysis
 // /// - **Actionable Fixes**: Provides specific solutions for common error patterns
 // /// - **Curated Documentation**: Includes relevant documentation links
 // ///
@@ -151,10 +152,10 @@ impl Analyzer {
         }
     }
 
-    /// Enable or disable AI-powered analysis
+    /// Enable or disable small model analysis
     ///
     /// # Arguments
-    /// * `use_ai` - Whether to use AI analysis (requires Ollama to be running)
+    /// * `use_ai` - Whether to use small model analysis (requires Ollama to be running)
     pub fn with_ai(mut self, use_ai: bool) -> Self {
         self.use_ai = use_ai;
         self
