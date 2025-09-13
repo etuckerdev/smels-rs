@@ -99,9 +99,7 @@ async fn main() {
     }
 
     if ai_debug {
-        unsafe {
-            std::env::set_var("SMELS_AI_DEBUG", "1");
-        }
+        std::env::set_var("SMELS_AI_DEBUG", "1");
     }
 
     let input = if web_mode {
