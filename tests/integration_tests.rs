@@ -84,7 +84,7 @@ async fn test_cache_functionality() {
     let result2 = analyzer.analyze(input).await;
 
     // Second result should be cached
-    assert_eq!(result2.summary, "Previously resolved issue (cached)");
+    assert_eq!(result2.summary, result1.summary);
     assert_eq!(result2.root_causes, vec!["Cached resolution".to_string()]);
     assert_eq!(result1.fixes, result2.fixes); // Fixes should be the same
 }

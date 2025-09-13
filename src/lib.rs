@@ -103,6 +103,7 @@ use std::fs;
 #[derive(Serialize, Deserialize, Debug)]
 struct CacheEntry {
     input_hash: String,
+    summary: String,
     fixes: Vec<String>,
     timestamp: u64,
 }
@@ -187,7 +188,7 @@ impl Analyzer {
         let input_hash = format!("{:x}", Md5::digest(input));
         if let Some(cached) = self.cache.get(&input_hash) {
             let mut result = AnalysisResult {
-                summary: "Previously resolved issue (cached)".to_string(),
+                summary: cached.summary.clone(),
                 root_causes: vec!["Cached resolution".to_string()],
                 fixes: cached.fixes.clone(),
                 related: vec![],
@@ -336,6 +337,7 @@ impl Analyzer {
             input_hash.clone(),
             CacheEntry {
                 input_hash,
+                summary: result.summary.clone(),
                 fixes: result.fixes.clone(),
                 timestamp: chrono::Utc::now().timestamp() as u64,
             },
