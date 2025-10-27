@@ -89,7 +89,7 @@ jobs:
       run: cargo build --release
 
     - name: Upload release binary
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: smels-${{ runner.os }}
         path: target/release/smels
@@ -112,7 +112,7 @@ jobs:
       run: cargo doc --no-deps --all-features
 
     - name: Upload documentation
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: docs
         path: target/doc/
